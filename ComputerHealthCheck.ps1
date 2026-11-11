@@ -7,7 +7,7 @@
   可选参数: -Days 14   (事件回看天数, 默认 7)
             -Deep      (需管理员: 附加 SFC/DISM 系统文件深度扫描, 较慢)
 .OUTPUT
-  屏幕输出 + 在桌面生成完整报告 ComputerHealthReport_时间戳.txt
+  屏幕输出 + 在脚本目录/logs 下生成完整报告 ComputerHealthReport_时间戳.txt
 #>
 param(
     [int]$Days = 7,
@@ -319,8 +319,9 @@ if ($fail.Count -gt 0) {
 
 # ============ 保存报告 ============
 $stamp = Get-Date -Format 'yyyyMMdd_HHmm'
-# 优先保存到脚本所在目录, 不可写时依次退到 文档 / TEMP
-$dir1 = Split-Path -Parent $MyInvocation.MyCommand.Path
+# 保存到脚本目录下的 logs 子目录 (不存在则自动创建), 不可写时依次退到 文档 / TEMP
+$dir1 = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) 'logs'
+New-Item -ItemType Directory -Path $dir1 -Force | Out-Null
 $dir2 = [Environment]::GetFolderPath('MyDocuments')
 $path = $null
 foreach ($d in @($dir1, $dir2, $env:TEMP)) {
